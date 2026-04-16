@@ -10,8 +10,8 @@ use App\Http\Controllers\BookingController;
 |--------------------------------------------------------------------------
 */
 
-// Homepage → show all events
-Route::get('/', [EventController::class, 'index'])->name('home');
+// Homepage → dashboard
+Route::view('/', 'dashboard')->name('home');
 
 
 
