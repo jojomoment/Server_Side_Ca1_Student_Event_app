@@ -22,25 +22,33 @@ class EventController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'location' => 'required|string|max:255',
-            'event_date' => 'required|date',
-            'capacity' => 'required|integer|min:1',
-        ]);
+{
+    $request->validate([
+        'title' => 'required|string|max:255',
+        'description' => 'required|string',
+        'location' => 'required|string|max:255',
+        'event_date' => 'required|date',
+        'capacity' => 'required|integer|min:1',
+        'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+    ]);
 
-        Event::create([
-            'title' => $request->title,
-            'description' => $request->description,
-            'location' => $request->location,
-            'event_date' => $request->event_date,
-            'capacity' => $request->capacity,
-        ]);
+    $imagePath = null;
 
-        return redirect()->route('events.index')->with('success', 'Event created successfully.');
+    if ($request->hasFile('image')) {
+        $imagePath = $request->file('image')->store('events', 'public');
     }
+
+    Event::create([
+        'title' => $request->title,
+        'description' => $request->description,
+        'location' => $request->location,
+        'event_date' => $request->event_date,
+        'capacity' => $request->capacity,
+        'image' => $imagePath,
+    ]);
+
+    return redirect()->route('events.index')->with('success', 'Event created successfully.');
+}
 
     public function show(Event $event)
     {
