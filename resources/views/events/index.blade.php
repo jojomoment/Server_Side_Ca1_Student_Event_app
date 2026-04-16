@@ -8,22 +8,20 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
-                <h3 class="text-lg font-bold mb-4 text-gray-900 dark:text-gray-100">
-                    All Events
-                </h3>
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100">All Events</h3>
 
-                @if(session('success'))
-                    <div class="bg-green-100 text-green-800 p-4 rounded mb-4">
-                        {{ session('success') }}
-                    </div>
-                @endif
-
-                @if(auth()->check() && auth()->user()->is_admin)
-                    <div class="mb-4">
+                    @if(Auth::user()->role === 'admin')
                         <a href="{{ route('events.create') }}"
-                           class="inline-block bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">
+                           class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded">
                             Create Event
                         </a>
+                    @endif
+                </div>
+
+                @if(session('success'))
+                    <div class="mb-4 p-3 bg-green-100 text-green-800 rounded">
+                        {{ session('success') }}
                     </div>
                 @endif
 
@@ -35,7 +33,7 @@
                                 <th class="text-left p-2 text-gray-900 dark:text-gray-100">Location</th>
                                 <th class="text-left p-2 text-gray-900 dark:text-gray-100">Date</th>
                                 <th class="text-left p-2 text-gray-900 dark:text-gray-100">Capacity</th>
-                                <th class="text-left p-2 text-gray-900 dark:text-gray-100">Action</th>
+                                <th class="text-left p-2 text-gray-900 dark:text-gray-100">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -45,18 +43,35 @@
                                     <td class="p-2 text-gray-900 dark:text-gray-100">{{ $event->location }}</td>
                                     <td class="p-2 text-gray-900 dark:text-gray-100">{{ $event->event_date }}</td>
                                     <td class="p-2 text-gray-900 dark:text-gray-100">{{ $event->capacity }}</td>
-                                    <td class="p-2 text-gray-900 dark:text-gray-100">
-                                        @auth
-                                            <a href="{{ route('bookings.create', $event->id) }}"
-                                               class="inline-block bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
-                                                Book Event
-                                            </a>
-                                        @else
-                                            <a href="{{ route('login') }}"
-                                               class="inline-block bg-gray-600 text-white px-3 py-1 rounded hover:bg-gray-700">
-                                                Login to Book
-                                            </a>
-                                        @endauth
+                                    <td class="p-2">
+                                        <div class="flex flex-wrap gap-2">
+                                            @if(Auth::user()->role !== 'admin')
+                                                <form method="POST" action="{{ route('bookings.store', $event) }}">
+                                                    @csrf
+                                                    <button type="submit"
+                                                            class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded">
+                                                        Book
+                                                    </button>
+                                                </form>
+                                            @endif
+
+                                            @if(Auth::user()->role === 'admin')
+                                                <a href="{{ route('events.edit', $event) }}"
+                                                   class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded">
+                                                    Edit
+                                                </a>
+
+                                                <form method="POST" action="{{ route('events.destroy', $event) }}">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit"
+                                                            onclick="return confirm('Delete this event?')"
+                                                            class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded">
+                                                        Delete
+                                                    </button>
+                                                </form>
+                                            @endif
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach
