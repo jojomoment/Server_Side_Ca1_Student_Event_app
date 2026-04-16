@@ -6,17 +6,7 @@ use App\Http\Controllers\BookingController;
 
 /*
 |--------------------------------------------------------------------------
-| Test Route
-|--------------------------------------------------------------------------
-*/
-
-Route::get('/test-create', function () {
-    return 'TEST ROUTE WORKS';
-});
-
-/*
-|--------------------------------------------------------------------------
-| Public Routes
+| Public Route
 |--------------------------------------------------------------------------
 */
 
@@ -24,7 +14,7 @@ Route::get('/', [EventController::class, 'dashboard'])->name('home');
 
 /*
 |--------------------------------------------------------------------------
-| Authenticated Routes
+| Auth Routes
 |--------------------------------------------------------------------------
 */
 
@@ -32,6 +22,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [EventController::class, 'dashboard'])->name('dashboard');
 
     Route::get('/events', [EventController::class, 'index'])->name('events.index');
+    Route::get('/events/create', [EventController::class, 'create'])->name('events.create');
     Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
 
     Route::post('/events/{event}/book', [BookingController::class, 'store'])->name('bookings.store');
@@ -47,7 +38,6 @@ Route::middleware(['auth'])->group(function () {
 */
 
 Route::middleware(['auth', 'admin'])->group(function () {
-    Route::get('/events/create', [EventController::class, 'create'])->name('events.create');
     Route::post('/events', [EventController::class, 'store'])->name('events.store');
     Route::get('/events/{event}/edit', [EventController::class, 'edit'])->name('events.edit');
     Route::put('/events/{event}', [EventController::class, 'update'])->name('events.update');

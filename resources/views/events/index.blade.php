@@ -8,6 +8,7 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
+
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100">All Events</h3>
 
@@ -34,30 +35,73 @@
                                 <th class="text-left p-2 text-gray-900 dark:text-gray-100">Title</th>
                                 <th class="text-left p-2 text-gray-900 dark:text-gray-100">Location</th>
                                 <th class="text-left p-2 text-gray-900 dark:text-gray-100">Date</th>
-                                <th class="text-left p-2 text-gray-900 dark:text-gray-100">Capacity</th>
+                                <th class="text-left p-2 text-gray-900 dark:text-gray-100">Seats Left</th>
+                                <th class="text-left p-2 text-gray-900 dark:text-gray-100">Status</th>
                                 <th class="text-left p-2 text-gray-900 dark:text-gray-100">Actions</th>
                             </tr>
                         </thead>
+
                         <tbody>
                             @foreach($events as $event)
+
+                                @php
+                                    $booked = \App\Models\Booking::where('event_id', $event->id)->count();
+                                    $remaining = $event->capacity - $booked;
+                                    $isFull = $remaining <= 0;
+                                @endphp
+
                                 <tr class="border-b">
-                                    <td class="p-2 text-gray-900 dark:text-gray-100">{{ $event->title }}</td>
-                                    <td class="p-2 text-gray-900 dark:text-gray-100">{{ $event->location }}</td>
-                                    <td class="p-2 text-gray-900 dark:text-gray-100">{{ $event->event_date }}</td>
-                                    <td class="p-2 text-gray-900 dark:text-gray-100">{{ $event->capacity }}</td>
+                                    <td class="p-2 text-gray-900 dark:text-gray-100">
+                                        {{ $event->title }}
+                                    </td>
+
+                                    <td class="p-2 text-gray-900 dark:text-gray-100">
+                                        {{ $event->location }}
+                                    </td>
+
+                                    <td class="p-2 text-gray-900 dark:text-gray-100">
+                                        {{ \Carbon\Carbon::parse($event->event_date)->format('d M Y H:i') }}
+                                    </td>
+
+                                    <td class="p-2 font-semibold {{ $isFull ? 'text-red-500' : 'text-green-600' }}">
+                                        {{ max($remaining, 0) }}
+                                    </td>
+
+                                    <td class="p-2">
+                                        @if($isFull)
+                                            <span class="bg-red-100 text-red-700 px-2 py-1 rounded text-sm">
+                                                Full
+                                            </span>
+                                        @else
+                                            <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-sm">
+                                                Available
+                                            </span>
+                                        @endif
+                                    </td>
+
                                     <td class="p-2">
                                         <div class="flex flex-wrap gap-2">
+
                                             @auth
+                                                {{-- USER BOOK BUTTON --}}
                                                 @if(Auth::user()->role !== 'admin')
-                                                    <form method="POST" action="{{ route('bookings.store', $event) }}">
-                                                        @csrf
-                                                        <button type="submit"
-                                                                class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded">
-                                                            Book
+                                                    @if(!$isFull)
+                                                        <form method="POST" action="{{ route('bookings.store', $event) }}">
+                                                            @csrf
+                                                            <button type="submit"
+                                                                    class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded">
+                                                                Book
+                                                            </button>
+                                                        </form>
+                                                    @else
+                                                        <button disabled
+                                                                class="bg-gray-400 text-white px-3 py-1 rounded cursor-not-allowed">
+                                                            Full
                                                         </button>
-                                                    </form>
+                                                    @endif
                                                 @endif
 
+                                                {{-- ADMIN BUTTONS --}}
                                                 @if(Auth::user()->role === 'admin')
                                                     <a href="{{ route('events.edit', $event) }}"
                                                        class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded">
@@ -74,12 +118,14 @@
                                                         </button>
                                                     </form>
                                                 @endif
+
                                             @else
                                                 <a href="{{ route('login') }}"
                                                    class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded">
                                                     Log In to Book
                                                 </a>
                                             @endauth
+
                                         </div>
                                     </td>
                                 </tr>
@@ -89,6 +135,7 @@
                 @else
                     <p class="text-gray-700 dark:text-gray-300">No events found.</p>
                 @endif
+
             </div>
         </div>
     </div>
