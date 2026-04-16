@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('app_users', function (Blueprint $table) {
             $table->id(); // BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY
 
             $table->string('name'); // VARCHAR(255) NOT NULL
@@ -31,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('app_users');
     }
 };
