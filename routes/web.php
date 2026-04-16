@@ -11,7 +11,7 @@ use App\Http\Controllers\BookingController;
 */
 
 // Homepage → dashboard
-Route::view('/', 'dashboard')->name('home');
+Route::get('/', [EventController::class, 'dashboard'])->name('home');
 
 
 
@@ -23,7 +23,7 @@ Route::resource('events', EventController::class)->only([
 
 
 // Dashboard
-Route::view('/dashboard', 'dashboard')->name('dashboard');
+Route::get('/dashboard', [EventController::class, 'dashboard'])->name('dashboard');
 
 // Public bookings page
 Route::get('/my-bookings', [BookingController::class, 'index'])

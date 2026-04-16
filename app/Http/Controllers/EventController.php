@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Booking;
 use App\Models\Event;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 class EventController extends Controller
 {
@@ -79,9 +82,21 @@ class EventController extends Controller
 
     public function dashboard()
     {
-        $events = Event::all();
+        $featuredEvents = Event::withCount('bookings')
+            ->orderBy('event_date', 'asc')
+            ->take(3)
+            ->get();
 
-        return view('dashboard', compact('events'));
+        $stats = [
+            'events' => Event::count(),
+            'upcomingEvents' => Event::where('event_date', '>=', now())->count(),
+            'bookings' => Booking::count(),
+            'admins' => Schema::hasColumn('users', 'role')
+                ? User::where('role', 'admin')->count()
+                : 0,
+        ];
+
+        return view('dashboard', compact('featuredEvents', 'stats'));
     }
 
     public function welcome()
