@@ -11,17 +11,19 @@ class BookingController extends Controller
 {
     public function index()
     {
-        $bookings = Booking::with('event')
-            ->where('user_id', Auth::id())
-            ->latest()
-            ->get();
+        $bookings = Auth::check()
+            ? Booking::with('event')
+                ->where('app_user_id', Auth::id())
+                ->latest()
+                ->get()
+            : collect();
 
         return view('bookings.index', compact('bookings'));
     }
 
     public function store(Event $event)
     {
-        $existingBooking = Booking::where('user_id', Auth::id())
+        $existingBooking = Booking::where('app_user_id', Auth::id())
             ->where('event_id', $event->id)
             ->first();
 
@@ -38,7 +40,7 @@ class BookingController extends Controller
         }
 
         Booking::create([
-            'user_id' => Auth::id(),
+            'app_user_id' => Auth::id(),
             'event_id' => $event->id,
         ]);
 

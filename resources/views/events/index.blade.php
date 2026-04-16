@@ -11,12 +11,14 @@
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100">All Events</h3>
 
-                    @if(Auth::user()->role === 'admin')
-                        <a href="{{ route('events.create') }}"
-                           class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded">
-                            Create Event
-                        </a>
-                    @endif
+                    @auth
+                        @if(Auth::user()->role === 'admin')
+                            <a href="{{ route('events.create') }}"
+                               class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded">
+                                Create Event
+                            </a>
+                        @endif
+                    @endauth
                 </div>
 
                 @if(session('success'))
@@ -45,32 +47,39 @@
                                     <td class="p-2 text-gray-900 dark:text-gray-100">{{ $event->capacity }}</td>
                                     <td class="p-2">
                                         <div class="flex flex-wrap gap-2">
-                                            @if(Auth::user()->role !== 'admin')
-                                                <form method="POST" action="{{ route('bookings.store', $event) }}">
-                                                    @csrf
-                                                    <button type="submit"
-                                                            class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded">
-                                                        Book
-                                                    </button>
-                                                </form>
-                                            @endif
+                                            @auth
+                                                @if(Auth::user()->role !== 'admin')
+                                                    <form method="POST" action="{{ route('bookings.store', $event) }}">
+                                                        @csrf
+                                                        <button type="submit"
+                                                                class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded">
+                                                            Book
+                                                        </button>
+                                                    </form>
+                                                @endif
 
-                                            @if(Auth::user()->role === 'admin')
-                                                <a href="{{ route('events.edit', $event) }}"
-                                                   class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded">
-                                                    Edit
+                                                @if(Auth::user()->role === 'admin')
+                                                    <a href="{{ route('events.edit', $event) }}"
+                                                       class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded">
+                                                        Edit
+                                                    </a>
+
+                                                    <form method="POST" action="{{ route('events.destroy', $event) }}">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit"
+                                                                onclick="return confirm('Delete this event?')"
+                                                                class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded">
+                                                            Delete
+                                                        </button>
+                                                    </form>
+                                                @endif
+                                            @else
+                                                <a href="{{ route('login') }}"
+                                                   class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded">
+                                                    Log In to Book
                                                 </a>
-
-                                                <form method="POST" action="{{ route('events.destroy', $event) }}">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit"
-                                                            onclick="return confirm('Delete this event?')"
-                                                            class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded">
-                                                        Delete
-                                                    </button>
-                                                </form>
-                                            @endif
+                                            @endauth
                                         </div>
                                     </td>
                                 </tr>

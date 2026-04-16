@@ -32,12 +32,15 @@
                                 My Bookings
                             </a>
 
-                            @if(Auth::user()->role === 'admin')
-                                <a href="{{ route('events.create') }}"
-                                   class="border border-slate-400 px-6 py-3 rounded-full text-sm font-semibold hover:bg-white transition">
-                                    Create Event
-                                </a>
-                            @endif
+                            @auth
+                                @if(auth()->user()->role == 'admin')
+                                    <p>Admin Panel</p>
+                                    <a href="{{ route('events.create') }}"
+                                       class="border border-slate-400 px-6 py-3 rounded-full text-sm font-semibold hover:bg-white transition">
+                                        Create Event
+                                    </a>
+                                @endif
+                            @endauth
                         </div>
                     </div>
 
@@ -45,20 +48,29 @@
                     <div class="flex justify-center lg:justify-end">
                         <div class="bg-white rounded-3xl shadow-xl p-6 w-full max-w-sm text-slate-900">
 
-                            <div class="flex items-center gap-4 mb-5">
-                                <div class="w-12 h-12 rounded-full bg-slate-900 flex items-center justify-center text-white font-bold">
-                                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                                </div>
+                            @auth
+                                <div class="flex items-center gap-4 mb-5">
+                                    <div class="w-12 h-12 rounded-full bg-slate-900 flex items-center justify-center text-white font-bold">
+                                        {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                                    </div>
 
-                                <div>
-                                    <h2 class="text-lg font-bold">
-                                        {{ Auth::user()->name }}
-                                    </h2>
-                                    <p class="text-sm text-slate-500 capitalize">
-                                        {{ Auth::user()->role }}
+                                    <div>
+                                        <h2 class="text-lg font-bold">
+                                            {{ Auth::user()->name }}
+                                        </h2>
+                                        <p class="text-sm text-slate-500 capitalize">
+                                            {{ Auth::user()->role }}
+                                        </p>
+                                    </div>
+                                </div>
+                            @else
+                                <div class="mb-5">
+                                    <h2 class="text-lg font-bold">Guest Access</h2>
+                                    <p class="text-sm text-slate-500">
+                                        You can browse event pages without logging in.
                                     </p>
                                 </div>
-                            </div>
+                            @endauth
 
                             <div class="border-t border-slate-200 my-4"></div>
 
@@ -80,12 +92,19 @@
                                     Browse Events
                                 </a>
 
-                                @if(Auth::user()->role === 'admin')
-                                    <a href="{{ route('events.create') }}"
-                                       class="block text-center border border-purple-300 text-purple-700 py-2 rounded-lg text-sm font-semibold hover:bg-purple-50">
-                                        Create Event
+                                @auth
+                                    @if(Auth::user()->role === 'admin')
+                                        <a href="{{ route('events.create') }}"
+                                           class="block text-center border border-purple-300 text-purple-700 py-2 rounded-lg text-sm font-semibold hover:bg-purple-50">
+                                            Create Event
+                                        </a>
+                                    @endif
+                                @else
+                                    <a href="{{ route('login') }}"
+                                       class="block text-center border border-slate-300 py-2 rounded-lg text-sm font-semibold hover:bg-slate-100">
+                                        Log In for More
                                     </a>
-                                @endif
+                                @endauth
                             </div>
                         </div>
                     </div>

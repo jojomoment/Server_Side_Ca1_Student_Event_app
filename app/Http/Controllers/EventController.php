@@ -76,4 +76,18 @@ class EventController extends Controller
 
         return redirect()->route('events.index')->with('success', 'Event deleted successfully.');
     }
+
+    public function dashboard()
+    {
+        $events = Event::all();
+
+        return view('dashboard', compact('events'));
+    }
+
+    public function welcome()
+    {
+        $events = Event::orderBy('event_date', 'asc')->get();
+
+        return view('welcome', compact('events'));
+    }
 }
