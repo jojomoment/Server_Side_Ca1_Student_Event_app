@@ -15,6 +15,7 @@ class Event extends Model
         'location',
         'event_date',
         'capacity',
+        'image',
     ];
 
     public function bookings()
