@@ -15,7 +15,11 @@
                     </div>
                 @endif
 
-                @if($bookings->isEmpty())
+                @guest
+                    <p class="text-gray-700 dark:text-gray-300">
+                        You can open this page without logging in, but bookings are only shown for signed-in users.
+                    </p>
+                @elseif($bookings->isEmpty())
                     <p class="text-gray-700 dark:text-gray-300">
                         You have no bookings yet.
                     </p>
